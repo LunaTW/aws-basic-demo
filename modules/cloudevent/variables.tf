@@ -8,4 +8,6 @@ variable "event_rule_schedule" {
 
 variable "target_id" {}
 
-variable "cloudevent_trigger_target_arn" {}
+variable "cloudevent_trigger_target_arn" {
+  default = ""
+}

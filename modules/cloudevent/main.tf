@@ -15,6 +15,5 @@ resource "aws_cloudwatch_event_target" "default" {
 }
 
 output "cloudwatch_event_rule_arn" {
-  value   = aws_cloudwatch_event_rule.default.arn
-  default = ""
+  value = aws_cloudwatch_event_rule.default.arn
 }

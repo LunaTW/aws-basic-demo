@@ -50,3 +50,14 @@ module "luna_cloudEvent_trigger_lottery_recommendation_lambda" {
   target_id                             = "SendToSNS"
   event_rule_schedule                   = var.event_rule_schedule
 }
+
+
+// ****************************** templates ****************************** //
+module "luna_lottery_generator_recommendation_email_for_VIP_user" {
+  source          = "./modules/sns_email_subscription_with_vip_filter"
+  display_name    = "luna_lottery_generator_recommendation_email_for_VIP_user"
+  email_addresses = var.vip_user_email
+  stack_name      = "lunaSNSSendEmailToVIPUserStack"
+  tags            = var.tags
+  topicArn        = module.luna_lottery_recommendation_topic.aws_sns_topic_arn
+}

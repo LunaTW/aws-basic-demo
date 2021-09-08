@@ -7,4 +7,5 @@
 Task：
 七星彩彩票推荐系统
 1. 七星彩规则 [0-10]*6 + [0-14]*1
-2. cloudwatch event 每五分钟 触发一次 彩票自动生成器（auto_lottery_generator_lambda）， 其生成的结果将发布至 彩票推荐SNS（luna_lottery_recommendation_topic），下游的订阅者（luna_lottery_recommendation_queue）将会得到此推荐号码。(Task 1)
+2. cloudwatch event 每五分钟 触发一次 彩票自动生成器（auto_lottery_generator_lambda）， 其生成的结果将发布至 彩票推荐SNS（luna_lottery_recommendation_topic），下游的订阅者SQS（luna_lottery_recommendation_queue）将会得到此推荐号码。(Task 1)
+3. 作为VIP 用户，彩票推荐服务将通过Email的形式推送给我 （SQS -> email）(Task 2)
