@@ -21,3 +21,13 @@ output "sqs_queue_name" {
   description = "Name of aws_sqs_queue"
   value       = module.sqs_with_subscription.sqs_queue_name
 }
+
+output "dead_letter_queue_arn" {
+  description = "ARN of dlq topic"
+  value       = module.sqs_with_subscription.dead_letter_queue_arn
+}
+
+output "dead_letter_queue_name" {
+  description = "Name of dlq"
+  value       = module.sqs_with_subscription.dead_letter_queue_name
+}

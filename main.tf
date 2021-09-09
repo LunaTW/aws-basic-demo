@@ -7,6 +7,13 @@ module "luna_lottery_recommendation_topic" {
   kms_master_key_id = "alias/luna-lottery-system-key-alias"
 }
 
+module "luna_monitoring_topic" {
+  source       = "./modules/sns"
+  display_name = "luna'S monitoring SNS"
+  sns_name     = "luna_monitoring_SNS"
+  tags         = var.tags
+}
+
 // ****************************** kms ****************************** //
 module "lottery_basic_kms" {
   source        = "./modules/kms"
@@ -52,6 +59,32 @@ resource "aws_lambda_event_source_mapping" "lottery_SQS_trigger_tracking_lambda"
   function_name    = module.luna_lottery_SQS_tracking_lambda.aws_lambda_function_arn
 }
 
+module "luna_vip_lottery_recommendation_monitor_lambda" {
+  source                  = "./modules/lambda_with_log_and_dlq"
+  lambda_function_name    = "luna_vip_lottery_recommendation_monitor_lambda"
+  lambda_execute_filename = "./functions/luna_vip_lottery_recommendation_monitor.zip"
+  lambda_function_role    = module.luna_lottery_recommendation_monitoring_role.iam_role_arn
+  lambda_handler          = "luna_vip_lottery_recommendation_monitor.vip_lottery_recommendation_monitor"
+  principal               = "sns.amazonaws.com"
+  source_code_hash        = filebase64sha256("./functions/luna_vip_lottery_recommendation_monitor.zip")
+  lambda_runtime          = "python3.7"
+  lambda_env_variables = {
+    nothing = "nothing"
+  }
+  tags = var.tags
+}
+
+resource "aws_sns_topic_subscription" "lottery_SNS_trigger_tracking_lambda" {
+  topic_arn = module.luna_lottery_recommendation_topic.aws_sns_topic_arn
+  protocol  = "lambda"
+  endpoint  = module.luna_vip_lottery_recommendation_monitor_lambda.aws_lambda_function_arn
+  filter_policy = <<EOF
+  {
+    "CustomType": ["vip"]
+  }
+  EOF
+}
+
 // ****************************** SQS ****************************** //
 module "luna_lottery_recommendation_queue" {
   source   = "./modules/sqs-with-subscription"
@@ -81,4 +114,50 @@ module "luna_lottery_generator_recommendation_email_for_VIP_user" {
   stack_name      = "lunaSNSSendEmailToVIPUserStack"
   tags            = var.tags
   topicArn        = module.luna_lottery_recommendation_topic.aws_sns_topic_arn
+}
+
+module "luna_monitoring_SNS_send_email_to_admin" {
+  source          = "./modules/sns_email_subscription"
+  display_name    = "luna_monitoring_SNS_send_email_to_admin"
+  email_addresses = var.admin_email
+  stack_name      = "lunaSNSSendEmailToAdminStack"
+  tags            = var.tags
+  topicArn        = module.luna_monitoring_topic.aws_sns_topic_arn
+}
+
+
+// ****************************** cloudwatch ******************************//
+module "luna_lottery_sqs_message_Visible_alarm" {
+  source            = "./modules/cloudwatch_alarm"
+  alarm_name        = "luna_lottery_sqs_message_viable_message_alarm"
+  alarm_description = "Error: More than 10 lottery recommend number cannot be consumed! "
+  dimensions = {
+    QueueName = module.luna_lottery_recommendation_queue.dead_letter_queue_name
+  }
+  metric_name = var.aws_sqs_metric_queue_message_avaiable
+  threshold   = 10
+  // maximum viable message is 10
+  namespace = "AWS/SQS"
+  statistic = "Maximum"
+  ok_actions = [
+    module.luna_monitoring_topic.aws_sns_topic_arn]
+  alarm_actions = [
+    module.luna_monitoring_topic.aws_sns_topic_arn]
+}
+
+module "luna_lottery_fraud_check_alarm_for_vip_user" {
+  source            = "./modules/cloudwatch_alarm"
+  alarm_name        = "luna_lottery_fraud_check_alarm_for_vip_user"
+  alarm_description = "Warning! Warning! Warning! VIP system is under attack!"
+  dimensions = {
+    QueueName = module.luna_vip_lottery_recommendation_monitor_lambda.dlq_name
+  }
+  metric_name = var.aws_sqs_metric_queue_message_avaiable
+  threshold   = 5
+  namespace = "AWS/SQS"
+  statistic = "Maximum"
+  ok_actions = [
+    module.luna_monitoring_topic.aws_sns_topic_arn]
+  alarm_actions = [
+    module.luna_monitoring_topic.aws_sns_topic_arn]
 }

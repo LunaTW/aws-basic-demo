@@ -28,8 +28,3 @@ output "iam_role_arn" {
   description = "ARN of iam role"
   value       = aws_iam_role.iam_role.arn
 }
-
-output "iam_role_name" {
-  description = "Name of iam role"
-  value       = aws_iam_role.iam_role.name
-}

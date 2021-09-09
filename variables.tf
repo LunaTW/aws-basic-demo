@@ -13,3 +13,8 @@ variable "event_rule_schedule" {
   description = "The schedule in minutes the event rule triggers"
   default     = "rate(5 minutes)"
 }
+
+variable "aws_sqs_metric_queue_message_avaiable" {
+  description = "This is a metric from aws"
+  default     = "ApproximateNumberOfMessagesVisible"
+}
