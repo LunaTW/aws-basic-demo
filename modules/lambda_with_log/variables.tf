@@ -20,6 +20,8 @@ variable "lambda_env_variables" {
   default = null
 }
 
-variable "lambda_upstream_source_arn" {}
+variable "lambda_upstream_source_arn" {
+  default = ""
+}
 
 variable "principal" {}

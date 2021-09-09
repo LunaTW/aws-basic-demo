@@ -8,4 +8,17 @@ Task：
 七星彩彩票推荐系统
 1. 七星彩规则 [0-10]*6 + [0-14]*1
 2. cloudwatch event 每五分钟 触发一次 彩票自动生成器（auto_lottery_generator_lambda）， 其生成的结果将发布至 彩票推荐SNS（luna_lottery_recommendation_topic），下游的订阅者SQS（luna_lottery_recommendation_queue）将会得到此推荐号码。(Task 1)
-3. 作为VIP 用户，彩票推荐服务将通过Email的形式推送给我 （SQS -> email）(Task 2)
+3. 作为VIP 用户，彩票推荐服务将通过Email的形式推送给我 （SNS -> email）(Task 2)
+4. 作为普通客户，彩票推荐服务将通过Email的形式推送给我（SQS可订阅多个客户感兴趣的SNS topic，然后 SQS -> lambda -> email）(Task3) 
+
+监控系统
+1. 彩票推荐系统有 SNS （luna_l）
+
+
+
+Ref
+
+- [Send an email using the AWS SDK for Python (Boto)](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/send-using-sdk-python.html)
+- [sqs-microservice-python3](https://github.com/Keetmalin/AWS-SQS-SES-Lambda-Thread-Polling/blob/master/sqs-microservice-python3.py)
+- [Lambda-AWS-SES-Send-Email Public](https://github.com/thigley986/Lambda-AWS-SES-Send-Email/blob/master/SendEmail.py)
+- [为什么lambda send email 失败？](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html?icmpid=docs_ses_console)

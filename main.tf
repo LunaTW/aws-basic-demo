@@ -31,6 +31,27 @@ module "auto_lottery_generator_lambda" {
   lambda_upstream_source_arn = module.luna_cloudEvent_trigger_lottery_recommendation_lambda.cloudwatch_event_rule_arn
 }
 
+module "luna_lottery_SQS_tracking_lambda" {
+  source                  = "./modules/lambda_with_log"
+  lambda_function_name    = "luna_lottery_SQS_tracking_lambda_for_public_user"
+  lambda_execute_filename = "./functions/luna_lottery_SQS_tracking.zip"
+  lambda_function_role    = module.luna_lottery_recommendation_sqs_consume_role.iam_role_arn
+  lambda_handler          = "luna_lottery_SQS_tracking.sqs_tracking_log"
+  principal               = "sqs.amazonaws.com"
+  lambda_runtime          = "python3.7"
+  source_code_hash        = filebase64sha256("./functions/luna_lottery_SQS_tracking.zip")
+  lambda_env_variables = {
+    publicUserEmail = var.public_user_email
+    sender = var.admin_email
+  }
+//  lambda_upstream_source_arn = ""  // default can triggered by sqs?
+}
+
+resource "aws_lambda_event_source_mapping" "lottery_SQS_trigger_tracking_lambda" {
+  event_source_arn = module.luna_lottery_recommendation_queue.sqs_queue_arn
+  function_name    = module.luna_lottery_SQS_tracking_lambda.aws_lambda_function_arn
+}
+
 // ****************************** SQS ****************************** //
 module "luna_lottery_recommendation_queue" {
   source   = "./modules/sqs-with-subscription"
