@@ -7,11 +7,17 @@
 3. 作为VIP 用户，彩票推荐服务将通过Email的形式推送给我 （SNS -> email）(Task 2)
 4. 作为普通客户，彩票推荐服务将通过Email的形式推送给我（SQS可订阅多个客户感兴趣的SNS topic，然后 SQS -> lambda -> email）(Task3) 
 
+<div align="center"><img src="https://github.com/LunaTW/aws-basic-demo/blob/master/Ref/tf.png?raw=true" width=90%/></div>
+
+
 监控系统
 0. KMS 加密
 1. 彩票推荐系统通过 SNS （luna_monitoring_SNS）收集各项监控数据，并将收集的数据发送给 监控系统中（admin email）.
 2. VIP监控平台：经大师计算，13 不是一个吉利的彩票数字，因此，决定添加一个监控，即 当 vip推荐号码 中出现数字13时，则会生成警报。将会发送将报警信息发送至 彩票监控平台（luna_monitoring_SNS）。(SNS(lottery_generator) --> lambda -> dlq -> metric -> SNS(monitoring) -> email)（task 4）
 3. VIP监控Plus：增加一个 彩票自动生成器（auto_lottery_generator_lambda）的监控，来监控是否出出现问题13。（custom metric）（Task 5）
+
+<div align="center"><img src="https://github.com/LunaTW/aws-basic-demo/blob/master/Ref/tf_monitoring.png?raw=true" width=90%/></div>
+
 
 数据持久化
 1. 增加 DynamoDB 数据库，保存所有数据记录 （Task6）
