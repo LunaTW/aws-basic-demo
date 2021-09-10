@@ -49,9 +49,8 @@ module "luna_lottery_SQS_tracking_lambda" {
   source_code_hash        = filebase64sha256("./functions/luna_lottery_SQS_tracking.zip")
   lambda_env_variables = {
     publicUserEmail = var.public_user_email
-    sender = var.admin_email
+    sender          = var.admin_email
   }
-//  lambda_upstream_source_arn = ""  // default can triggered by sqs?
 }
 
 resource "aws_lambda_event_source_mapping" "lottery_SQS_trigger_tracking_lambda" {
@@ -75,15 +74,43 @@ module "luna_vip_lottery_recommendation_monitor_lambda" {
 }
 
 resource "aws_sns_topic_subscription" "lottery_SNS_trigger_tracking_lambda" {
-  topic_arn = module.luna_lottery_recommendation_topic.aws_sns_topic_arn
-  protocol  = "lambda"
-  endpoint  = module.luna_vip_lottery_recommendation_monitor_lambda.aws_lambda_function_arn
+  topic_arn     = module.luna_lottery_recommendation_topic.aws_sns_topic_arn
+  protocol      = "lambda"
+  endpoint      = module.luna_vip_lottery_recommendation_monitor_lambda.aws_lambda_function_arn
   filter_policy = <<EOF
   {
     "CustomType": ["vip"]
   }
   EOF
 }
+
+module "luna_custom_metric_to_cloudwatch_lambda" {
+  source                  = "./modules/lambda_with_log"
+  lambda_function_name    = "luna_custom_metric_to_cloudwatch_alarm"
+  lambda_execute_filename = "./functions/luna_custom_metric_to_cloudwatch.zip"
+  lambda_function_role    = module.luna_lottery_recommendation_monitoring_role.iam_role_arn
+  lambda_handler          = "luna_custom_metric_to_cloudwatch.custom_metric"
+  principal               = "events.amazonaws.com"
+  lambda_runtime          = "python3.7"
+  source_code_hash        = filebase64sha256("./functions/luna_custom_metric_to_cloudwatch.zip")
+  lambda_env_variables = {
+    nothing = "nothing"
+  }
+}
+
+// TODO log filter for what?
+//resource "aws_cloudwatch_log_metric_filter" "luna_aws_cloudwatch_log_metric_filter" {
+//  name           = "luna_aws_cloudwatch_vip_log_metric_filter"
+//  pattern        = "13"
+//  log_group_name = module.auto_lottery_generator_lambda.log_group_name
+//
+//  metric_transformation {
+//    name      = "luna_fraud_check_metric"
+//    namespace = "Luna"
+//    //    dimensions = "fraud_choice"
+//    value = "1"
+//  }
+//}
 
 // ****************************** SQS ****************************** //
 module "luna_lottery_recommendation_queue" {
@@ -140,9 +167,9 @@ module "luna_lottery_sqs_message_Visible_alarm" {
   namespace = "AWS/SQS"
   statistic = "Maximum"
   ok_actions = [
-    module.luna_monitoring_topic.aws_sns_topic_arn]
+  module.luna_monitoring_topic.aws_sns_topic_arn]
   alarm_actions = [
-    module.luna_monitoring_topic.aws_sns_topic_arn]
+  module.luna_monitoring_topic.aws_sns_topic_arn]
 }
 
 module "luna_lottery_fraud_check_alarm_for_vip_user" {
@@ -154,10 +181,10 @@ module "luna_lottery_fraud_check_alarm_for_vip_user" {
   }
   metric_name = var.aws_sqs_metric_queue_message_avaiable
   threshold   = 5
-  namespace = "AWS/SQS"
-  statistic = "Maximum"
+  namespace   = "AWS/SQS"
+  statistic   = "Maximum"
   ok_actions = [
-    module.luna_monitoring_topic.aws_sns_topic_arn]
+  module.luna_monitoring_topic.aws_sns_topic_arn]
   alarm_actions = [
-    module.luna_monitoring_topic.aws_sns_topic_arn]
+  module.luna_monitoring_topic.aws_sns_topic_arn]
 }

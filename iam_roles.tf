@@ -36,18 +36,18 @@ data "aws_iam_policy_document" "luna_lottery_recommendation_sqs_consume_policy_d
   statement {
     actions = ["logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"]
+    "logs:PutLogEvents"]
     resources = ["arn:aws:logs:*:*:*"]
   }
 
   statement {
-    actions = ["sqs:*"]
+    actions   = ["sqs:*"]
     resources = ["arn:aws:sqs:*:*:*"]
   }
 
   statement {
     actions = ["ses:SendEmail",
-      "ses:SendRawEmail"]
+    "ses:SendRawEmail"]
     resources = ["*"]
   }
 }
@@ -64,18 +64,23 @@ data "aws_iam_policy_document" "luna_lottery_recommendation_monitoring_role_poli
   statement {
     actions = ["logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"]
+    "logs:PutLogEvents"]
     resources = ["arn:aws:logs:*:*:*"]
   }
 
   statement {
-    actions = ["sns:*"]
+    actions   = ["sns:*"]
     resources = ["arn:aws:sns:*:*:*"]
   }
 
   statement {
-    actions = ["sqs:*"]
+    actions   = ["sqs:*"]
     resources = ["arn:aws:sqs:*:*:*"]
+  }
+
+  statement {
+    actions   = ["cloudwatch:PutMetricData"]
+    resources = ["*"]
   }
 
 }

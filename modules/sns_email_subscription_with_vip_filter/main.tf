@@ -7,8 +7,8 @@ resource "aws_cloudformation_stack" "sns_email_subscription" {
 data "template_file" "cloudformation_sns_email_stack" {
   template = file("${path.module}/email-sns-stack.json.tpl")
   vars = {
-    topicArn      = var.topicArn
-    protocol      = var.protocol
-    endpoint      = var.email_addresses
+    topicArn = var.topicArn
+    protocol = var.protocol
+    endpoint = var.email_addresses
   }
 }

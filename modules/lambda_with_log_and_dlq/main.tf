@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "lambda" {
-  filename         = var.lambda_execute_filename
-  function_name    = var.lambda_function_name
-  role             = var.lambda_function_role
+  filename      = var.lambda_execute_filename
+  function_name = var.lambda_function_name
+  role          = var.lambda_function_role
   dead_letter_config {
     target_arn = aws_sqs_queue.dead-letter-queue.arn
   }
