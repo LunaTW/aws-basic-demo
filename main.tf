@@ -188,3 +188,27 @@ module "luna_lottery_fraud_check_alarm_for_vip_user" {
   alarm_actions = [
   module.luna_monitoring_topic.aws_sns_topic_arn]
 }
+
+// DynamoDB
+resource "aws_dynamodb_table" "luna-lottery-dynamodb-table" {
+  name           = "luna-lottery-dynamodb-table"
+  read_capacity  = 20
+  write_capacity = 20
+  hash_key       = "CustomType"
+  range_key      = "RecommendNumber"
+
+  attribute {
+    name = "CustomType"
+    type = "S"
+  }
+
+  attribute {
+    name = "RecommendNumber"
+    type = "S"
+  }
+
+  tags = {
+    Name        = "lottery-dynamodb-table"
+    Environment = "DEV"
+  }
+}

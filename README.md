@@ -13,6 +13,8 @@
 2. VIP监控平台：经大师计算，13 不是一个吉利的彩票数字，因此，决定添加一个监控，即 当 vip推荐号码 中出现数字13时，则会生成警报。将会发送将报警信息发送至 彩票监控平台（luna_monitoring_SNS）。(SNS(lottery_generator) --> lambda -> dlq -> metric -> SNS(monitoring) -> email)（task 4）
 3. VIP监控Plus：增加一个 彩票自动生成器（auto_lottery_generator_lambda）的监控，来监控是否出出现问题13。（custom metric）（Task 5）
 
+数据持久化
+1. 增加 DynamoDB 数据库，保存所有数据记录 （Task6）
 
 
 ## Ref
